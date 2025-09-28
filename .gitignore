@@ -1,0 +1,80 @@
+# --- General ---
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# --- Environment files ---
+.env
+.env.*
+!.env.example
+
+# --- Node / JavaScript ---
+node_modules/
+logs/
+*.log
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.npmrc
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.eggs/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
+
+# --- Build / Coverage / Caches ---
+dist/
+build/
+coverage/
+.nyc_output/
+.cache/
+.parcel-cache/
+
+# --- Editor / IDE ---
+.vscode/
+.idea/
+*.code-workspace
+
+# --- Models and large artifacts ---
+**/models/**
+**/checkpoints/**
+*.model
+*.pkl
+*.joblib
+*.h5
+*.hdf5
+*.ckpt
+*.onnx
+*.pt
+*.pth
+*.sav
+
+# Project-specific trained model
+erp-prototype/dw_model.json
+
+# --- Generated data/outputs (keep sources) ---
+erp-prototype/demo/results_kpi.csv
+erp-prototype/demo/summary_results.csv
+erp-prototype/demo/plots/
+
+# --- Hyperledger Fabric / Wallet artifacts (if generated locally) ---
+wallet/
+crypto-config/
+*keystore*/
+*msp*/
+*.pem
+*.key
+
+# --- OS-specific ---
+Desktop.ini
+$RECYCLE.BIN/

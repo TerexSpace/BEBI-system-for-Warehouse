@@ -1,0 +1,11 @@
+{
+  "typeCheckingMode": "basic",
+  "reportMissingImports": "none",
+  "reportMissingModuleSource": "none",
+  "executionEnvironments": [
+    {
+      "root": "./erp-prototype",
+      "extraPaths": ["./erp-prototype"]
+    }
+  ]
+}
