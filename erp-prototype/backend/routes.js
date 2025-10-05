@@ -38,7 +38,7 @@ const checkServices = (req, res, next) => {
  */
 router.post('/items', checkServices, async (req, res) => {
     try {
-        const { id, length, width, height, weight, organizationId } = req.body;
+        const { id, length, width, height, weight, organizationId = 'org1' } = req.body;
 
         if (!id || !length || !width || !height) {
             return res.status(400).json({
@@ -54,14 +54,15 @@ router.post('/items', checkServices, async (req, res) => {
         }
 
         // Record measurement on blockchain
-        const result = await fabricService.recordMeasurement(id, length, width, height, predictedWeight);
+        const result = await fabricService.recordMeasurement(id, length, width, height, predictedWeight, organizationId);
 
-        logger.info(`Item recorded: ${id}`, { length, width, height, predictedWeight });
+        logger.info(`Item recorded: ${id}`, { length, width, height, predictedWeight, organizationId });
 
         res.json({
             success: true,
             itemId: id,
             predictedWeight: predictedWeight,
+            organizationId: organizationId,
             blockchainResult: result,
             timestamp: new Date().toISOString()
         });
@@ -289,6 +290,241 @@ router.get('/plots/generate', async (req, res) => {
             res.status(500).json({ success: false, error: stderr });
         }
     });
+});
+
+// Tariff management endpoints
+
+/**
+ * POST /api/warehouse/tariffs
+ * Create a new tariff policy
+ */
+router.post('/tariffs', checkServices, async (req, res) => {
+    try {
+        const { id, name, description, rate, unit, category, createdBy } = req.body;
+
+        if (!id || !name || !rate || !unit || !category) {
+            return res.status(400).json({
+                error: 'Missing required fields',
+                message: 'id, name, rate, unit, category are required'
+            });
+        }
+
+        const result = await fabricService.createTariffPolicy(id, name, description, rate, unit, category, createdBy);
+
+        logger.info(`Tariff policy created: ${id}`);
+
+        res.json({
+            success: true,
+            policyId: id,
+            blockchainResult: result,
+            timestamp: new Date().toISOString()
+        });
+
+    } catch (error) {
+        logger.error('Error creating tariff policy:', error);
+        res.status(500).json({
+            error: 'Failed to create tariff policy',
+            message: error.message
+        });
+    }
+});
+
+/**
+ * GET /api/warehouse/tariffs/:id
+ * Retrieve a tariff policy
+ */
+router.get('/tariffs/:id', checkServices, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const policy = await fabricService.getTariffPolicy(id);
+
+        if (!policy) {
+            return res.status(404).json({
+                error: 'Tariff policy not found',
+                message: `No tariff policy found for id ${id}`
+            });
+        }
+
+        res.json({
+            policyId: id,
+            policy: policy,
+            timestamp: new Date().toISOString()
+        });
+
+    } catch (error) {
+        logger.error('Error retrieving tariff policy:', error);
+        res.status(500).json({
+            error: 'Failed to retrieve tariff policy',
+            message: error.message
+        });
+    }
+});
+
+/**
+ * POST /api/warehouse/tariffs/calculate
+ * Calculate tariff for an item
+ */
+router.post('/tariffs/calculate', checkServices, async (req, res) => {
+    try {
+        const { itemId, organizationId = 'org1' } = req.body;
+
+        if (!itemId) {
+            return res.status(400).json({
+                error: 'Missing required fields',
+                message: 'itemId is required'
+            });
+        }
+
+        const calculation = await fabricService.calculateTariff(itemId, organizationId);
+
+        logger.info(`Tariff calculated for item: ${itemId}`);
+
+        res.json({
+            success: true,
+            itemId: itemId,
+            calculation: calculation,
+            timestamp: new Date().toISOString()
+        });
+
+    } catch (error) {
+        logger.error('Error calculating tariff:', error);
+        res.status(500).json({
+            error: 'Failed to calculate tariff',
+            message: error.message
+        });
+    }
+});
+
+// Dispute management endpoints
+
+/**
+ * POST /api/warehouse/disputes
+ * Create a new dispute
+ */
+router.post('/disputes', checkServices, async (req, res) => {
+    try {
+        const { id, itemId, disputeType, description, raisedBy } = req.body;
+
+        if (!id || !itemId || !disputeType || !description || !raisedBy) {
+            return res.status(400).json({
+                error: 'Missing required fields',
+                message: 'id, itemId, disputeType, description, raisedBy are required'
+            });
+        }
+
+        const result = await fabricService.createDispute(id, itemId, disputeType, description, raisedBy);
+
+        logger.info(`Dispute created: ${id}`);
+
+        res.json({
+            success: true,
+            disputeId: id,
+            blockchainResult: result,
+            timestamp: new Date().toISOString()
+        });
+
+    } catch (error) {
+        logger.error('Error creating dispute:', error);
+        res.status(500).json({
+            error: 'Failed to create dispute',
+            message: error.message
+        });
+    }
+});
+
+/**
+ * GET /api/warehouse/disputes/:id
+ * Retrieve a dispute
+ */
+router.get('/disputes/:id', checkServices, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const dispute = await fabricService.getDispute(id);
+
+        if (!dispute) {
+            return res.status(404).json({
+                error: 'Dispute not found',
+                message: `No dispute found for id ${id}`
+            });
+        }
+
+        res.json({
+            disputeId: id,
+            dispute: dispute,
+            timestamp: new Date().toISOString()
+        });
+
+    } catch (error) {
+        logger.error('Error retrieving dispute:', error);
+        res.status(500).json({
+            error: 'Failed to retrieve dispute',
+            message: error.message
+        });
+    }
+});
+
+/**
+ * PUT /api/warehouse/disputes/:id/status
+ * Update dispute status
+ */
+router.put('/disputes/:id/status', checkServices, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status, resolution, assignedTo } = req.body;
+
+        if (!status) {
+            return res.status(400).json({
+                error: 'Missing required fields',
+                message: 'status is required'
+            });
+        }
+
+        const result = await fabricService.updateDisputeStatus(id, status, resolution, assignedTo);
+
+        logger.info(`Dispute status updated: ${id}`);
+
+        res.json({
+            success: true,
+            disputeId: id,
+            blockchainResult: result,
+            timestamp: new Date().toISOString()
+        });
+
+    } catch (error) {
+        logger.error('Error updating dispute status:', error);
+        res.status(500).json({
+            error: 'Failed to update dispute status',
+            message: error.message
+        });
+    }
+});
+
+/**
+ * GET /api/warehouse/disputes
+ * Get all disputes with optional status filter
+ */
+router.get('/disputes', checkServices, async (req, res) => {
+    try {
+        const { status } = req.query;
+
+        const disputes = await fabricService.getAllDisputes(status);
+
+        res.json({
+            success: true,
+            disputes: disputes,
+            count: disputes.length,
+            timestamp: new Date().toISOString()
+        });
+
+    } catch (error) {
+        logger.error('Error retrieving disputes:', error);
+        res.status(500).json({
+            error: 'Failed to retrieve disputes',
+            message: error.message
+        });
+    }
 });
 
 module.exports = router;

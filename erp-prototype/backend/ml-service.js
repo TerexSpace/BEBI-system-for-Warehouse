@@ -147,11 +147,17 @@ class MLService {
                 `
 import sys
 import json
+import numpy as np
 from optimization.model import predict_weight
 
 # Read features from command line argument
 features = [float(x) for x in sys.argv[1].split(',')]
 result = predict_weight(features)
+
+# Convert numpy types to native Python types for JSON serialization
+if hasattr(result, 'item'):  # Convert numpy types
+    result = result.item()
+
 print(json.dumps({'prediction': result}))
                 `,
                 inputData
