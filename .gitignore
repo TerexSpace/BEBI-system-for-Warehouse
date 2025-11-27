@@ -78,3 +78,25 @@ crypto-config/
 # --- OS-specific ---
 Desktop.ini
 $RECYCLE.BIN/
+
+# --- Claude Code / Development Tools ---
+.claude/
+.claude.json
+
+# --- Development Helper Documents (Review & Submission) ---
+# These are internal documents for JOSS submission and code review
+# They should not be committed to GitHub
+JOSS_SUBMISSION_CHECKLIST.md
+JOSS_SUBMISSION_INSTRUCTIONS.md
+JOSS_REVIEW_SUMMARY.md
+JOSS_FINAL_SUBMISSION_GUIDE.md
+COMPREHENSIVE_REVIEW_REPORT.md
+SUBMISSION_STATUS.md
+joss_paper_preparation.md
+README_JOSS.md
+
+# --- Installation artifacts that should not be committed ---
+# User will install these via npm/pip
+node_modules/
+npm-debug.log
+package-lock.json.lock

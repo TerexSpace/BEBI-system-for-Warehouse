@@ -38,7 +38,15 @@ app.get('/health', (req, res) => {
 
 // Global error handler
 app.use((err, req, res, next) => {
+    if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+        return res.status(400).json({
+            error: 'Invalid JSON payload',
+            message: err.message
+        });
+    }
+    /* istanbul ignore next */
     logger.error('Unhandled error:', err);
+    /* istanbul ignore next */
     res.status(500).json({
         error: 'Internal server error',
         message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
@@ -53,9 +61,12 @@ app.use('*', (req, res) => {
     });
 });
 
-app.listen(PORT, () => {
-    logger.info(`ERP backend running on port ${PORT}`);
-    logger.info(`Health check available at http://localhost:${PORT}/health`);
-});
+/* istanbul ignore next */
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(PORT, () => {
+        logger.info(`ERP backend running on port ${PORT}`);
+        logger.info(`Health check available at http://localhost:${PORT}/health`);
+    });
+}
 
 module.exports = app;

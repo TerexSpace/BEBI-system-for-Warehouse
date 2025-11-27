@@ -4,6 +4,7 @@ const logger = log4js.getLogger();
 class FabricService {
     constructor() {
         this.initialized = false;
+        this.measurements = new Map();
         this.initialize();
     }
 
@@ -59,6 +60,7 @@ class FabricService {
                 blockNumber: Math.floor(Math.random() * 10000) + 1000
             };
 
+            this.measurements.set(id, measurement);
             logger.info(`Measurement recorded on blockchain: ${id}`, measurement);
 
             return {
@@ -85,24 +87,14 @@ class FabricService {
         }
 
         try {
-            // Simulate blockchain query
             await new Promise(resolve => setTimeout(resolve, 30 + Math.random() * 50));
 
-            // Mock data - in real implementation, this would query the ledger
-            const mockMeasurement = {
-                id,
-                length: 15.2 + Math.random() * 10,
-                width: 8.7 + Math.random() * 5,
-                height: 12.1 + Math.random() * 8,
-                weight: 4.2 + Math.random() * 6,
-                timestamp: new Date(Date.now() - Math.random() * 86400000).toISOString(), // Random time within last 24h
-                organizationId: 'org1'
-            };
+            if (this.measurements.has(id)) {
+                logger.info(`Measurement retrieved from blockchain: ${id}`);
+                return this.measurements.get(id);
+            }
 
-            logger.info(`Measurement retrieved from blockchain: ${id}`);
-
-            return mockMeasurement;
-
+            return null;
         } catch (error) {
             logger.error('Failed to retrieve measurement:', error);
             throw error;

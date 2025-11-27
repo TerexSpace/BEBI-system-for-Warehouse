@@ -6,7 +6,7 @@
   "scripts": {
     "start": "cd erp-prototype/backend && node app.js",
     "dev": "cd erp-prototype/backend && nodemon app.js",
-    "test": "cd erp-prototype && jest",
+    "test": "cd erp-prototype && jest --runInBand --coverage",
     "fabric-stub": "cd erp-prototype/backend && node fabric-stub.js",
     "setup": "cd erp-prototype && pip install -r ../requirements.txt && npm install",
     "train-model": "cd erp-prototype && python optimization/train.py",

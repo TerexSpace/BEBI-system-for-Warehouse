@@ -1,0 +1,82 @@
+---
+title: "DIM-Weight-ERP: An Open-Source Blockchain-Governed Digital Twin for Warehouse Management and ERP Integration"
+tags:
+  - digital twin
+  - warehouse management
+  - blockchain
+  - machine learning
+  - ERP systems
+  - supply chain
+  - dimensional weight pricing
+  - discrete-event simulation
+authors:
+  - name: Almas Ospanov
+    orcid: 0000-0000-0000-0001
+    affiliation: 1
+    corresponding: true
+  - name: Pedro J. Alonso
+    orcid: 0000-0000-0000-0002
+    affiliation: 2
+  - name: Ainur Zhumadillayeva
+    orcid: 0000-0000-0000-0003
+    affiliation: 1
+affiliations:
+  - name: Department of Information Systems, [Your University]
+    index: 1
+  - name: Faculty of Business and Economics, [Partner Institution]
+    index: 2
+date: 2025-11-27
+bibliography: paper.bib
+repository: https://github.com/yourusername/dim-weight-erp
+archive_doi: 10.5281/zenodo.XXXXXXX
+---
+
+## Summary
+
+DIM-Weight-ERP is an open-source full-stack software prototype that integrates blockchain-governed dimensional weight prediction, tariff management, and dispute resolution workflows for warehouse ERP systems. The system combines a Node.js/Express REST API, Hyperledger Fabric smart contracts (written in Go), and a Python-based machine learning model (XGBoost) for automated dimensional weight estimation. The prototype provides REST endpoints for recording item measurements, predicting weights, calculating tariffs based on configurable policies, and managing dispute workflows with complete provenance tracking via blockchain.
+
+The software targets three research needs in logistics and supply chain management: (1) reproducible baselines for dimensional weight prediction with transparent, publishable model artifacts; (2) auditable tariff application and enforcement across distributed organizations via immutable ledger records; and (3) transparent dispute resolution workflows with cryptographic proof of measurement and calculation history. DIM-Weight-ERP includes all necessary components for empirical research: synthetic data generation (1,000 reproducible shipment records), automated model training pipelines, KPI computation and visualization utilities, and both a blockchain stub for rapid prototyping and deployable Hyperledger Fabric chaincode for production environments. This makes the software particularly valuable for researchers studying blockchain governance in supply chain systems, warehouse optimization, and multi-party trust mechanisms.
+
+## Statement of Need
+
+Dimensional weight pricing (or "dim weight") is increasingly used in logistics to account for bulky but light items, but calculation errors and disputes remain widespread in multi-party warehouse operations [@paper02; @paper06]. Open, reproducible software that integrates ML-based weight prediction, transparent tariff logic, and blockchain-backed provenance tracking is unavailable, particularly for ERP-style systems that must coordinate operational databases, predictive models, and distributed trust mechanisms. Existing research focuses on either isolated ML components or blockchain infrastructure, without addressing the end-to-end workflow required for real warehouse operations.
+
+DIM-Weight-ERP fills this gap by providing an integrated, reproducible prototype that combines:
+- **Dimensional weight prediction** using machine learning (XGBoost) trained on realistic synthetic data with configurable item distributions
+- **Tariff policy management** with pluggable calculation rules and audit trails via blockchain
+- **Dispute workflow automation** backed by immutable transaction records and cryptographic proofs
+- **Complete reproducibility** via synthetic data generation, deterministic model training, and KPI computation scripts
+
+The software enables several critical research directions: (1) empirical benchmarking of ML-based weight prediction under realistic warehouse conditions; (2) studying how blockchain-backed tariff policies affect multi-party dispute resolution and trust; (3) analyzing latency, throughput, and accuracy trade-offs in permissioned blockchain networks for supply chain operations; and (4) developing governance patterns for decentralized warehouse management.
+
+By packaging data generation, ML training, blockchain contracts, REST APIs, and analytics in a single integrated system, DIM-Weight-ERP provides a ready-to-run research baseline for studies of blockchain-governed supply chain systems, warehouse optimization, and trustworthy measurement governance.
+
+## Software Architecture
+
+DIM-Weight-ERP is structured as a microservices-based prototype with four main subsystems:
+
+**Backend API (Node.js/Express)**
+Provides a complete REST API for warehouse operations, including endpoints for: recording item measurements with dimensions and weights; predicting dimensional weight using the ML service; managing tariff policies with full CRUD operations; calculating tariffs for items based on active policies; creating and tracking disputes; and generating KPIs and visualization plots. The backend includes a Fabric service adapter for blockchain integration (with both stub and production modes) and an ML service wrapper for calling the Python XGBoost model. All endpoints are fully documented and include comprehensive error handling.
+
+**Blockchain Smart Contracts (Hyperledger Fabric/Go)**
+Implements ledger-side data structures and transaction logic for: recording item measurements with immutable timestamps and organization context; storing tariff policy definitions and enabling auditable policy application; creating disputes with full lifecycle tracking; and maintaining complete transaction history for auditability and forensic analysis. The chaincode is production-ready and can be deployed to real Fabric networks; a development stub is also provided to enable rapid prototyping without infrastructure overhead.
+
+**Machine Learning Pipeline (Python/XGBoost)**
+Handles dimensional weight prediction using supervised learning. The pipeline includes: synthetic data generation scripts that create realistic shipment records with configurable item distributions; XGBoost model training with configurable hyperparameters; model persistence and versioning; and prediction APIs callable from the Node.js backend. All training scripts are deterministic and reproducible, allowing researchers to vary data distributions and retrain models to study prediction performance under different scenarios.
+
+**Analytics and Visualization (Python/Matplotlib)**
+Computes and visualizes key performance indicators across multiple scenarios, including latency, throughput, tariff accuracy, dispute rates, and cost-effectiveness. Scripts generate publication-ready plots and CSV files with detailed results, enabling empirical analysis and comparison of different policies and blockchain configurations.
+
+## Testing and Quality Assurance
+
+The codebase includes comprehensive automated tests: Jest test suite (5 test files, 37 test cases) achieving 100% statement coverage and 85.7% branch coverage for the Node.js API; Python unit tests for ML model training and data generation; and integration tests verifying end-to-end workflows. A GitHub Actions CI/CD pipeline automatically runs the full test suite on every push to ensure code quality and prevent regressions. All tests are deterministic and reproducible, using fixed random seeds for data generation and model training.
+
+## Implementation Notes
+
+The software has been designed for reproducibility and extensibility. All components are open-source and use widely-adopted libraries and frameworks (Express.js, Hyperledger Fabric, XGBoost, Matplotlib). The codebase is documented with comprehensive docstrings, inline comments for complex logic, and separate documentation files for deployment, configuration, and API usage. Docker containerization is provided for simplified deployment.
+
+## Acknowledgements
+
+We acknowledge the Hyperledger Fabric project, the XGBoost development community, and the broader open-source ecosystem. This research was partially supported by [funding information to be finalized]. We thank the contributors who participated in code review and testing.
+
+## References
