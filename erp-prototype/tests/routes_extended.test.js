@@ -55,6 +55,11 @@ describe("Tariff and dispute routes", () => {
   });
 
   test("calculates tariff for an item", async () => {
+    await request(app)
+      .post("/api/warehouse/items")
+      .send({ id: "item_for_tariff", length: 1, width: 1, height: 1, weight: 1 })
+      .expect(200);
+
     const res = await request(app)
       .post("/api/warehouse/tariffs/calculate")
       .send({ itemId: "item_for_tariff", organizationId: "org1" })

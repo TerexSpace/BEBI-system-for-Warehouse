@@ -31,5 +31,8 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
+      - name: Run seeded synthetic scenarios (Python)
+        run: python erp-prototype/demo/demo_scenarios.py --seed 42 --limit 50
+
       - name: Run tests
         run: npm test

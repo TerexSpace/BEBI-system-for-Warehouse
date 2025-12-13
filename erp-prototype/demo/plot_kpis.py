@@ -10,6 +10,8 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 # Fallback styles
 plt.style.use('seaborn-v0_8-whitegrid')
 
+# KPI data are synthetic and seeded; this script consumes the deterministic
+# outputs from demo_scenarios.py.
 # If summary doesn't exist, try to build from results_kpi
 if not os.path.exists(SUMMARY_CSV):
     results_csv = os.path.join(os.path.dirname(__file__), 'results_kpi.csv')

@@ -97,7 +97,7 @@ describe("Route error and edge paths", () => {
 
     await request(app)
       .post("/api/warehouse/plots/generate")
-      .expect(200);
+      .expect(500);
   });
 
   test("tariff validation returns 400 on missing fields", async () => {

@@ -51,7 +51,10 @@ class MLService {
             await this.ensureModelExists();
 
             // Use Python script to make prediction
-            const prediction = await this.callPythonModel(features);
+            const prediction = Number(await this.callPythonModel(features));
+            if (!Number.isFinite(prediction)) {
+                throw new Error('Non-numeric prediction received');
+            }
 
             logger.info(`Weight prediction: ${prediction.toFixed(2)} for features: ${features.join(', ')}`);
 

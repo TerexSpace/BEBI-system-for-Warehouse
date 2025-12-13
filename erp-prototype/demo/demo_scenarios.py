@@ -1,9 +1,11 @@
-import pandas as pd
-import numpy as np
-import time
+import argparse
+import os
 import random
 import sys
-import os
+import time
+
+import numpy as np
+import pandas as pd
 
 # Add the parent directory to the Python path so we can import optimization modules
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -104,7 +106,15 @@ def run_scenario(scenario_name, df, num_iterations=1000):
     return results
 
 def main():
-    """Run all demo scenarios"""
+    """Run all demo scenarios against synthetic, seeded data."""
+    parser = argparse.ArgumentParser(description="Run seeded synthetic scenarios.")
+    parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility")
+    parser.add_argument("--limit", type=int, default=1000, help="Limit iterations per scenario")
+    args = parser.parse_args()
+
+    np.random.seed(args.seed)
+    random.seed(args.seed)
+
     df = pd.read_csv("demo/synthetic_data.csv")
 
     scenarios = ['baseline_a', 'baseline_b', 'proposed']
@@ -112,8 +122,8 @@ def main():
     all_results = []
 
     for scenario in scenarios:
-        print(f"Running scenario: {scenario}")
-        results = run_scenario(scenario, df)
+        print(f"Running scenario: {scenario} (synthetic, seed={args.seed})")
+        results = run_scenario(scenario, df, num_iterations=args.limit)
         all_results.extend(results)
 
         # Print summary for this scenario

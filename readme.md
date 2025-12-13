@@ -1,6 +1,6 @@
 # DIM-Weight-ERP: Blockchain-Governed Digital Twin for Warehouse Management
 
-[![CI](https://github.com/yourusername/dim-weight-erp/workflows/CI/badge.svg)](https://github.com/yourusername/dim-weight-erp/actions)
+[![CI](https://github.com/TerexSpace/DIM-Weight-ERP.git/workflows/CI/badge.svg)](https://github.com/TerexSpace/DIM-Weight-ERP.git/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
 
@@ -139,26 +139,17 @@ Computes and visualizes key performance indicators including latency, throughput
 
 ## Testing
 
-The codebase includes comprehensive automated tests:
+The codebase includes automated Jest tests for the Node.js API and synthetic, seeded Python scenario runs. CI executes:
 
 ```bash
-# Run all tests with coverage
+# Run all Node tests with coverage
 npm test
 
-# Run Jest tests only
-npm test -- --testPathPattern=tests/
-
-# Run tests in watch mode
-npm test -- --watch
+# Run seeded synthetic scenarios (Python)
+python erp-prototype/demo/demo_scenarios.py --seed 42 --limit 50
 ```
 
-### Test Coverage
-
-- Node.js API: 100% statement coverage, 85.7% branch coverage
-- Test Suite: 5 files, 37 test cases
-- All tests are deterministic and reproducible
-
-A GitHub Actions CI/CD pipeline automatically runs the full test suite on every push to ensure code quality and prevent regressions.
+Coverage is reported by Jest for the backend routes and services. The synthetic KPI generation is deterministic via fixed seeds, and the GitHub Actions workflow runs both the Python scenarios and the Node suite on every push.
 
 ## Configuration
 
@@ -222,4 +213,3 @@ We acknowledge the Hyperledger Fabric project, XGBoost development team, and the
 ## Disclaimer
 
 This software is provided as-is for research and educational purposes. While it implements production-ready components, thorough testing and security audits are recommended before deployment in production environments.
-# DIM-Weight-ERP

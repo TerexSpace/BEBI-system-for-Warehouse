@@ -1,4 +1,3 @@
-/* istanbul ignore file */
 const express = require('express');
 const router = express.Router();
 const { FabricService } = require('./fabric-service');
@@ -6,7 +5,7 @@ const { MLService } = require('./ml-service');
 const log4js = require('log4js');
 const logger = log4js.getLogger();
 const path = require('path');
-const { spawn } = require('child_process');
+const childProcess = require('child_process');
 
 // Initialize services
 let fabricService;
@@ -41,8 +40,12 @@ const checkServices = (req, res, next) => {
 router.post('/items', checkServices, async (req, res) => {
     try {
         const { id, length, width, height, weight, organizationId = 'org1' } = req.body;
+        const lengthNum = Number(length);
+        const widthNum = Number(width);
+        const heightNum = Number(height);
+        const weightNum = weight !== undefined ? Number(weight) : undefined;
 
-        if (!id || !length || !width || !height) {
+        if (!id || !Number.isFinite(lengthNum) || !Number.isFinite(widthNum) || !Number.isFinite(heightNum)) {
             return res.status(400).json({
                 error: 'Missing required fields',
                 message: 'id, length, width, height are required'
@@ -50,15 +53,15 @@ router.post('/items', checkServices, async (req, res) => {
         }
 
         // Use ML service to predict weight if not provided
-        let predictedWeight = weight;
-        if (!weight) {
-            predictedWeight = mlService.predictWeight([length, width, height, 0.85]); // Default density factor
+        let predictedWeight = weightNum;
+        if (predictedWeight === undefined || Number.isNaN(predictedWeight)) {
+            predictedWeight = await mlService.predictWeight([lengthNum, widthNum, heightNum, 0.85]); // Default density factor
         }
 
         // Record measurement on blockchain
-        const result = await fabricService.recordMeasurement(id, length, width, height, predictedWeight, organizationId);
+        const result = await fabricService.recordMeasurement(id, lengthNum, widthNum, heightNum, predictedWeight, organizationId);
 
-        logger.info(`Item recorded: ${id}`, { length, width, height, predictedWeight, organizationId });
+        logger.info(`Item recorded: ${id}`, { length: lengthNum, width: widthNum, height: heightNum, predictedWeight, organizationId });
 
         res.json({
             success: true,
@@ -168,17 +171,28 @@ router.post('/optimize', checkServices, async (req, res) => {
         const optimizationResults = [];
 
         for (const item of items) {
-            const { length, width, height, densityFactor = 0.85 } = item;
+            const { length, width, height, densityFactor = 0.85, weight: providedWeight } = item;
+            const lengthNum = Number(length);
+            const widthNum = Number(width);
+            const heightNum = Number(height);
+            const densityNum = Number(densityFactor);
+
+            if (![lengthNum, widthNum, heightNum, densityNum].every(Number.isFinite)) {
+                return res.status(400).json({
+                    error: 'Invalid item dimensions',
+                    message: 'length, width, height, densityFactor must be numbers'
+                });
+            }
 
             // Get ML prediction for optimal weight
-            const predictedWeight = mlService.predictWeight([length, width, height, densityFactor]);
+            const predictedWeight = await mlService.predictWeight([lengthNum, widthNum, heightNum, densityNum]);
 
             optimizationResults.push({
                 itemId: item.id || `item_${optimizationResults.length + 1}`,
-                originalWeight: item.weight,
+                originalWeight: providedWeight,
                 predictedWeight: predictedWeight,
-                dimensions: { length, width, height },
-                densityFactor: densityFactor,
+                dimensions: { length: lengthNum, width: widthNum, height: heightNum },
+                densityFactor: densityNum,
                 confidence: 0.92 + Math.random() * 0.06 // Mock confidence score
             });
         }
@@ -262,7 +276,7 @@ router.use('/plots', express.static(plotsDir));
 router.post('/plots/generate', async (req, res) => {
     try {
         const scriptPath = path.join(__dirname, '../demo/plot_kpis.py');
-        const python = spawn('python', [scriptPath], { cwd: path.join(__dirname, '../') });
+        const python = childProcess.spawn('python', [scriptPath], { cwd: path.join(__dirname, '../') });
 
         let stdout = '';
         let stderr = '';
@@ -286,7 +300,7 @@ router.post('/plots/generate', async (req, res) => {
 // GET alias for convenience
 router.get('/plots/generate', async (req, res) => {
     const scriptPath = path.join(__dirname, '../demo/plot_kpis.py');
-    const python = spawn('python', [scriptPath], { cwd: path.join(__dirname, '../') });
+    const python = childProcess.spawn('python', [scriptPath], { cwd: path.join(__dirname, '../') });
 
     let stdout = '';
     let stderr = '';
@@ -311,15 +325,16 @@ router.get('/plots/generate', async (req, res) => {
 router.post('/tariffs', checkServices, async (req, res) => {
     try {
         const { id, name, description, rate, unit, category, createdBy } = req.body;
+        const rateNum = Number(rate);
 
-        if (!id || !name || !rate || !unit || !category) {
+        if (!id || !name || !Number.isFinite(rateNum) || !unit || !category) {
             return res.status(400).json({
                 error: 'Missing required fields',
-                message: 'id, name, rate, unit, category are required'
+                message: 'id, name, numeric rate, unit, category are required'
             });
         }
 
-        const result = await fabricService.createTariffPolicy(id, name, description, rate, unit, category, createdBy);
+        const result = await fabricService.createTariffPolicy(id, name, description, rateNum, unit, category, createdBy);
 
         logger.info(`Tariff policy created: ${id}`);
 
@@ -402,8 +417,9 @@ router.post('/tariffs/calculate', checkServices, async (req, res) => {
     /* istanbul ignore next */
     } catch (error) {
         logger.error('Error calculating tariff:', error);
-        res.status(500).json({
-            error: 'Failed to calculate tariff',
+        const statusCode = /not found/i.test(error.message) ? 404 : 500;
+        res.status(statusCode).json({
+            error: statusCode === 404 ? 'Measurement not found' : 'Failed to calculate tariff',
             message: error.message
         });
     }

@@ -5,6 +5,8 @@ class FabricService {
     constructor() {
         this.initialized = false;
         this.measurements = new Map();
+        this.tariffs = new Map();
+        this.disputes = new Map();
         this.initialize();
     }
 
@@ -176,6 +178,7 @@ class FabricService {
                 blockNumber: Math.floor(Math.random() * 10000) + 1000
             };
 
+            this.tariffs.set(id, policy);
             logger.info(`Tariff policy created: ${id}`, policy);
 
             return {
@@ -204,19 +207,11 @@ class FabricService {
         try {
             await new Promise(resolve => setTimeout(resolve, 30 + Math.random() * 50));
 
-            // Mock tariff policy data
-            const policy = {
-                id,
-                name: `Tariff Policy ${id}`,
-                description: `Description for tariff policy ${id}`,
-                rate: 0.1 + Math.random() * 0.4,
-                unit: ['weight', 'volume', 'item'][Math.floor(Math.random() * 3)],
-                category: 'shipping',
-                active: Math.random() > 0.2,
-                createdBy: 'admin',
-                createdAt: new Date(Date.now() - Math.random() * 86400000 * 30).toISOString()
-            };
+            if (!this.tariffs.has(id)) {
+                return null;
+            }
 
+            const policy = this.tariffs.get(id);
             logger.info(`Tariff policy retrieved: ${id}`);
             return policy;
 
@@ -240,26 +235,38 @@ class FabricService {
         try {
             await new Promise(resolve => setTimeout(resolve, 100 + Math.random() * 200));
 
-            // Mock tariff calculation
-            const baseTariff = 10 + Math.random() * 50;
-            const appliedPolicies = [
-                {
-                    id: 'policy_1',
-                    name: 'Weight-based tariff',
-                    rate: 0.5,
-                    unit: 'weight'
-                },
-                {
-                    id: 'policy_2',
-                    name: 'Volume-based tariff',
-                    rate: 0.1,
-                    unit: 'volume'
+            const measurement = this.measurements.get(itemId);
+            if (!measurement) {
+                throw new Error(`Measurement ${itemId} not found`);
+            }
+
+            const appliedPolicies = Array.from(this.tariffs.values()).filter(p => p.active !== false);
+            if (appliedPolicies.length === 0) {
+                throw new Error('No active tariff policies found');
+            }
+
+            let totalTariff = 0;
+            for (const policy of appliedPolicies) {
+                switch (policy.unit) {
+                    case 'weight':
+                        totalTariff += Number(measurement.weight) * policy.rate;
+                        break;
+                    case 'volume': {
+                        const volume = Number(measurement.length) * Number(measurement.width) * Number(measurement.height);
+                        totalTariff += volume * policy.rate;
+                        break;
+                    }
+                    case 'item':
+                        totalTariff += policy.rate;
+                        break;
+                    default:
+                        break;
                 }
-            ];
+            }
 
             const result = {
                 itemId,
-                totalTariff: baseTariff,
+                totalTariff,
                 appliedPolicies,
                 calculatedAt: new Date().toISOString(),
                 transactionId: `tx_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -306,6 +313,7 @@ class FabricService {
                 blockNumber: Math.floor(Math.random() * 10000) + 1000
             };
 
+            this.disputes.set(id, dispute);
             logger.info(`Dispute created: ${id}`, dispute);
 
             return {
@@ -334,20 +342,11 @@ class FabricService {
         try {
             await new Promise(resolve => setTimeout(resolve, 30 + Math.random() * 50));
 
-            // Mock dispute data
-            const dispute = {
-                id,
-                itemId: `item_${Math.floor(Math.random() * 100)}`,
-                disputeType: ['measurement', 'tariff', 'payment'][Math.floor(Math.random() * 3)],
-                description: `Dispute regarding ${id}`,
-                status: ['open', 'investigating', 'resolved', 'closed'][Math.floor(Math.random() * 4)],
-                raisedBy: 'user_' + Math.floor(Math.random() * 10),
-                assignedTo: Math.random() > 0.5 ? 'admin_' + Math.floor(Math.random() * 5) : '',
-                resolution: Math.random() > 0.3 ? 'Issue resolved in favor of customer' : '',
-                createdAt: new Date(Date.now() - Math.random() * 86400000 * 7).toISOString(),
-                updatedAt: new Date(Date.now() - Math.random() * 86400000 * 3).toISOString()
-            };
+            if (!this.disputes.has(id)) {
+                return null;
+            }
 
+            const dispute = this.disputes.get(id);
             logger.info(`Dispute retrieved: ${id}`);
             return dispute;
 
@@ -373,6 +372,17 @@ class FabricService {
         try {
             const txId = `tx_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
             await new Promise(resolve => setTimeout(resolve, 50 + Math.random() * 100));
+
+            if (!this.disputes.has(id)) {
+                throw new Error(`dispute ${id} not found`);
+            }
+
+            const dispute = this.disputes.get(id);
+            dispute.status = status;
+            dispute.resolution = resolution;
+            dispute.assignedTo = assignedTo;
+            dispute.updatedAt = new Date().toISOString();
+            this.disputes.set(id, dispute);
 
             const result = {
                 success: true,
@@ -404,24 +414,9 @@ class FabricService {
         try {
             await new Promise(resolve => setTimeout(resolve, 100 + Math.random() * 200));
 
-            // Mock disputes data
-            const disputes = [];
-            const count = Math.floor(Math.random() * 20) + 5;
-
-            for (let i = 0; i < count; i++) {
-                disputes.push({
-                    id: `dispute_${i + 1}`,
-                    itemId: `item_${Math.floor(Math.random() * 100)}`,
-                    disputeType: ['measurement', 'tariff', 'payment'][Math.floor(Math.random() * 3)],
-                    description: `Dispute ${i + 1}`,
-                    status: status || ['open', 'investigating', 'resolved', 'closed'][Math.floor(Math.random() * 4)],
-                    raisedBy: 'user_' + Math.floor(Math.random() * 10),
-                    assignedTo: Math.random() > 0.5 ? 'admin_' + Math.floor(Math.random() * 5) : '',
-                    resolution: Math.random() > 0.3 ? 'Issue resolved' : '',
-                    createdAt: new Date(Date.now() - Math.random() * 86400000 * 7).toISOString(),
-                    updatedAt: new Date(Date.now() - Math.random() * 86400000 * 3).toISOString()
-                });
-            }
+            const disputes = Array.from(this.disputes.values()).filter(
+                d => !status || d.status === status
+            );
 
             logger.info(`Retrieved ${disputes.length} disputes`);
             return disputes;

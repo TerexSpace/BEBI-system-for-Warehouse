@@ -13,10 +13,10 @@ type WarehouseContract struct {
 // Measurement represents item measurement data
 type Measurement struct {
   ID             string    `json:"id"`
-  Length         int       `json:"length"`
-  Width          int       `json:"width"`
-  Height         int       `json:"height"`
-  Weight         int       `json:"weight"`
+  Length         float64   `json:"length"`
+  Width          float64   `json:"width"`
+  Height         float64   `json:"height"`
+  Weight         float64   `json:"weight"`
   OrganizationID string    `json:"organizationId"`
   Timestamp      time.Time `json:"timestamp"`
 }
@@ -49,7 +49,7 @@ type Dispute struct {
 }
 
 // RecordMeasurement records item measurements with organization context
-func (c *WarehouseContract) RecordMeasurement(ctx contractapi.TransactionContextInterface, id string, length int, width int, height int, weight int, organizationId string) error {
+func (c *WarehouseContract) RecordMeasurement(ctx contractapi.TransactionContextInterface, id string, length float64, width float64, height float64, weight float64, organizationId string) error {
   measurement := Measurement{
     ID:             id,
     Length:         length,
@@ -83,7 +83,7 @@ func (c *WarehouseContract) GetMeasurement(ctx contractapi.TransactionContextInt
 
 // CreateTariffPolicy creates a new tariff policy
 func (c *WarehouseContract) CreateTariffPolicy(ctx contractapi.TransactionContextInterface, id string, name string, description string, rate float64, unit string, category string, createdBy string) error {
-  exists, err := ctx.GetStub().GetState(id)
+  exists, err := ctx.GetStub().GetState("tariff_" + id)
   if err != nil {
     return fmt.Errorf("failed to read from world state: %v", err)
   }
@@ -108,12 +108,12 @@ func (c *WarehouseContract) CreateTariffPolicy(ctx contractapi.TransactionContex
     return fmt.Errorf("failed to marshal tariff policy: %v", err)
   }
 
-  return ctx.GetStub().PutState(id, policyJSON)
+  return ctx.GetStub().PutState("tariff_"+id, policyJSON)
 }
 
 // GetTariffPolicy retrieves a tariff policy
 func (c *WarehouseContract) GetTariffPolicy(ctx contractapi.TransactionContextInterface, id string) (string, error) {
-  policyJSON, err := ctx.GetStub().GetState(id)
+  policyJSON, err := ctx.GetStub().GetState("tariff_" + id)
   if err != nil {
     return "", fmt.Errorf("failed to read from world state: %v", err)
   }
@@ -126,7 +126,7 @@ func (c *WarehouseContract) GetTariffPolicy(ctx contractapi.TransactionContextIn
 
 // UpdateTariffPolicy updates an existing tariff policy
 func (c *WarehouseContract) UpdateTariffPolicy(ctx contractapi.TransactionContextInterface, id string, name string, description string, rate float64, unit string, category string, active bool) error {
-  policyJSON, err := ctx.GetStub().GetState(id)
+  policyJSON, err := ctx.GetStub().GetState("tariff_" + id)
   if err != nil {
     return fmt.Errorf("failed to read from world state: %v", err)
   }
@@ -152,7 +152,7 @@ func (c *WarehouseContract) UpdateTariffPolicy(ctx contractapi.TransactionContex
     return fmt.Errorf("failed to marshal updated tariff policy: %v", err)
   }
 
-  return ctx.GetStub().PutState(id, updatedPolicyJSON)
+  return ctx.GetStub().PutState("tariff_"+id, updatedPolicyJSON)
 }
 
 // CalculateTariff calculates tariff for an item based on active policies
@@ -201,9 +201,9 @@ func (c *WarehouseContract) CalculateTariff(ctx contractapi.TransactionContextIn
     var charge float64
     switch policy.Unit {
     case "weight":
-      charge = float64(measurement.Weight) * policy.Rate
+      charge = measurement.Weight * policy.Rate
     case "volume":
-      volume := float64(measurement.Length * measurement.Width * measurement.Height)
+      volume := measurement.Length * measurement.Width * measurement.Height
       charge = volume * policy.Rate
     case "item":
       charge = policy.Rate
