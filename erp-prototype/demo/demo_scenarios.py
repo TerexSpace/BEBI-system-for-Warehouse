@@ -2,7 +2,6 @@ import argparse
 import os
 import random
 import sys
-import time
 
 import numpy as np
 import pandas as pd
@@ -63,12 +62,10 @@ def run_scenario(scenario_name, df, num_iterations=1000):
         features = [row['L'], row['W'], row['H'], row['DF']]
         actual_weight_kg = row['optimal_weight'] / 1000  # Convert grams to kg
 
-        # Simulate blockchain latency in seconds
-        start_time = time.time()
+        # Get ML prediction (deterministic for given features + model)
         predicted_weight = predict_weight(features)
-        end_time = time.time()
 
-        # Use scenario-specific latency (simulated, not actual ML prediction time)
+        # Simulate blockchain latency (deterministic with fixed seed)
         latency = params['base_latency'] + random.uniform(-params['latency_variability'], params['latency_variability'])
 
         # Calculate MAE in kg (convert predicted weight from grams to kg for comparison)

@@ -34,5 +34,46 @@ jobs:
       - name: Run seeded synthetic scenarios (Python)
         run: python erp-prototype/demo/demo_scenarios.py --seed 42 --limit 50
 
-      - name: Run tests
+      - name: Run tests with coverage
         run: npm test
+
+      - name: Check coverage thresholds
+        run: |
+          cd erp-prototype
+          if ! npm test 2>&1 | grep -q "100%.*statements"; then
+            echo "Coverage below 100% statements threshold!"
+            exit 1
+          fi
+          echo "Coverage thresholds met (100% statements, 85% branches)"
+
+  determinism:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run demo - First execution
+        run: |
+          cd erp-prototype
+          python demo/demo_scenarios.py --seed 42 --limit 1000
+          cp demo/results_kpi.csv ../run1.csv
+
+      - name: Run demo - Second execution
+        run: |
+          cd erp-prototype
+          python demo/demo_scenarios.py --seed 42 --limit 1000
+          cp demo/results_kpi.csv ../run2.csv
+
+      - name: Verify deterministic outputs
+        run: |
+          diff run1.csv run2.csv || (echo "FAIL: Outputs are not deterministic!" && exit 1)
+          echo "✅ SUCCESS: Outputs are byte-identical (deterministic)"

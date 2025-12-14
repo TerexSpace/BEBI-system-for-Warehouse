@@ -2,6 +2,20 @@
 
 This document provides concrete examples of how researchers can use BlockchainDT to investigate distributed consensus, Byzantine fault tolerance, and physical-digital state synchronization.
 
+> **VERSION NOTICE**: This document describes both **implemented features (v1.0.0)** and **planned features (v1.1+)**.
+>
+> **✅ Currently Available (v1.0.0)**:
+> - Section 1: Consensus Protocol Comparison (fully working)
+> - Section 6: Custom Research Scenarios (framework for extension)
+>
+> **🔜 Planned for Future Releases (v1.1+)**:
+> - Section 2: Byzantine Fault Tolerance Analysis (requires `byzantine_scenarios.py`)
+> - Section 3: Real-Time Performance Under Load (requires `benchmarks/stress_test.js`)
+> - Section 4: ML Model Validation (requires multi-party training scripts)
+> - Section 5: Network Partition Resilience (requires partition simulation)
+>
+> Contributions welcome! See [CONTRIBUTING.md](../CONTRIBUTING.md) to help implement planned features.
+
 ## Table of Contents
 
 1. [Consensus Protocol Comparison](#1-consensus-protocol-comparison)
@@ -49,18 +63,31 @@ python erp-prototype/demo/plot_kpis.py
    - Time to global agreement
    - Conflict resolution overhead
 
-### Expected Results
+### Actual Results (v1.0.0)
 
-| Protocol | Mean Latency | p99 Latency | Throughput | Byzantine Tolerance |
-|----------|--------------|-------------|------------|---------------------|
-| Eventually Consistent | 0.52s | 0.75s | 120 tx/s | 0% |
-| Raft (CFT) | 1.20s | 1.85s | 75 tx/s | 0% (crash only) |
-| PBFT (BFT) | 1.47s | 2.10s | 58 tx/s | 33% |
+A complete research case study has been conducted and is available in `results/consensus_comparison/`:
+
+| Protocol | Mean Latency | p95 Latency | Throughput | Accuracy (MAE) |
+|----------|--------------|-------------|------------|----------------|
+| No Consensus (baseline_a) | 0.522s | 0.611s | 119.9 tx/s | 2.116 |
+| PBFT (proposed) | 1.464s | 1.660s | 58.3 tx/s | 0.762 |
+| **Overhead** | **+180.8%** | **+171.7%** | **-51.3%** | **+64.0% better** |
+
+**Key Finding**: PBFT consensus adds 181% latency overhead but improves prediction accuracy by 64% through consensus-based validation filtering outlier predictions.
+
+See full analysis: [results/consensus_comparison/findings.md](../results/consensus_comparison/findings.md)
+
+### Reproduce This Study
+
+```bash
+cd results/consensus_comparison
+bash run.sh
+```
 
 ### Research Output
 
-- **Publication**: "Comparative Analysis of Consensus Protocols for Real-Time Digital Twin Synchronization"
-- **Venue**: ACM/IEEE distributed systems conferences (ICDCS, Middleware, SRDS)
+- **Example Publication Title**: "Latency-Accuracy Trade-offs in Blockchain Consensus for Physical-Digital State Synchronization"
+- **Target Venues**: ACM/IEEE distributed systems conferences (ICDCS, Middleware, SRDS)
 
 ---
 

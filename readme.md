@@ -183,20 +183,56 @@ npm run train-model
 
 # Run reproducible benchmark scenarios
 npm run demo
+```
+
+**Expected Output**:
+```
+Running scenario: baseline_a (synthetic, seed=42)
+  Avg Latency: 0.52s
+  Avg Throughput: 119.9 items/s
+  Avg MAE: 2.12
+  Avg Cost: $0.0020
+  Avg Dispute Rate: 0.02
+  Avg Recovery: 3.5min
+
+Running scenario: baseline_b (synthetic, seed=42)
+  Avg Latency: 2.03s
+  Avg Throughput: 44.9 items/s
+  ...
+
+Running scenario: proposed (synthetic, seed=42)
+  Avg Latency: 1.46s
+  Avg Throughput: 58.3 items/s
+  ...
+
+Results saved to demo/results_kpi.csv
+Summary saved to demo/summary_results.csv
+```
+
+**Verify Success**:
+```bash
+# Check outputs were created
+ls -lh erp-prototype/demo/results_kpi.csv erp-prototype/demo/summary_results.csv
+
+# Verify row count (should be 3001: header + 3000 rows)
+wc -l erp-prototype/demo/results_kpi.csv  # Expected: 3001
 
 # Generate publication plots
 python erp-prototype/demo/plot_kpis.py
+ls -lh erp-prototype/demo/*.png  # Should show comparison plots
 ```
 
-### Using Docker for Isolation
+### Alternative: Direct Execution
 
 ```bash
-# Build and run all components
-docker-compose up
+# Start backend API (in one terminal)
+npm start
 
 # API available at http://localhost:3000
-# Blockchain explorer at http://localhost:8080
+# Use Ctrl+C to stop
 ```
+
+> **Note**: Docker containerization is planned for v1.1. Current version requires local Node.js and Python installation.
 
 ### Custom Scenario Development
 

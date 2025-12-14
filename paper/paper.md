@@ -54,14 +54,20 @@ BlockchainDT enables research in:
 
 ### Related Research Software
 
-Several tools address adjacent problems:
+Several tools address adjacent problems, but none combine all three core capabilities:
 
-- **SimPy** [@SimPy2023]: Discrete-event simulation but no blockchain consensus
-- **Hyperledger Caliper** [@Hyperledger2023]: Blockchain benchmarking without physical-digital state synchronization
-- **Unity ML-Agents** [@Juliani2018]: Multi-agent RL environments but centralized coordination
-- **PBFT-Go** [@PBFT2023]: PBFT implementation without digital twin domain
+| Feature | SimPy | Hyperledger Caliper | Unity ML-Agents | PBFT-Go | **BlockchainDT** |
+|---------|-------|---------------------|-----------------|---------|------------------|
+| Discrete-event simulation | ✓ | ✗ | ✗ | ✗ | ✓ |
+| Byzantine consensus | ✗ | ✓ | ✗ | ✓ | ✓ |
+| ML-based state prediction | ✗ | ✗ | ✓ | ✗ | ✓ |
+| Physical-digital domain | ✓ (generic) | ✗ | ✗ | ✗ | ✓ (sensor fusion) |
+| Multi-party validation | ✗ | ✗ | ✗ | ✗ | ✓ |
+| Reproducible benchmarks | ✓ | ✓ | ✗ | ✗ | ✓ |
 
-**Gap**: No existing framework combines blockchain consensus, ML-based state prediction, and multi-party physical-digital synchronization in a reproducible research testbed.
+**Research Gap**: SimPy [@SimPy2023] provides discrete-event simulation but lacks Byzantine tolerance mechanisms. Hyperledger Caliper [@Hyperledger2023] benchmarks blockchain performance but has no physical-digital state synchronization domain. Unity ML-Agents [@Juliani2018] supports multi-agent RL but uses centralized coordination unsuitable for distributed consensus research. PBFT-Go [@PBFT2023] implements Byzantine consensus but without ML-based state prediction or reproducible research testbed.
+
+**BlockchainDT Contribution**: The first framework combining permissioned blockchain consensus, ML-driven state prediction, and reproducible multi-party benchmarking for physical-digital synchronization research.
 
 ## Software Architecture
 
@@ -104,50 +110,29 @@ Reproducible benchmarking and visualization:
 
 ## Research Applications
 
-### Investigating Consensus Overhead
+### Consensus Protocol Comparison
 
-Researchers can compare latency-throughput trade-offs:
+Researchers can compare latency-throughput trade-offs across three baseline scenarios:
 
-```python
-# Run baseline (no consensus), Raft, and PBFT scenarios
-python demo/demo_scenarios.py --consensus-protocol pbft --iterations 10000
-# Generate comparative plots: latency vs throughput, accuracy vs cost
+```bash
+# Run three consensus scenarios (1000 iterations each, deterministic seed)
+cd erp-prototype && python demo/demo_scenarios.py --seed 42 --limit 1000
+
+# Generate comparative plots
 python demo/plot_kpis.py
 ```
 
-Expected research questions:
-- How does PBFT consensus latency scale with validator count?
-- What is the accuracy penalty of eventually-consistent (no blockchain) approaches?
-- Can optimistic concurrency reduce consensus overhead for non-conflicting updates?
+**Current v1.0.0 scenarios**:
+- `baseline_a`: Eventually-consistent (no blockchain) - baseline for comparison
+- `baseline_b`: Centralized coordination - single authority model
+- `proposed`: PBFT-style consensus - distributed Byzantine tolerance
 
-### Byzantine ML Validation
+**Research questions enabled**:
+- How does consensus overhead affect latency and throughput?
+- What is the accuracy vs. cost trade-off for different coordination strategies?
+- Can blockchain consensus meet real-time digital twin requirements?
 
-Investigate adversarial scenarios where malicious agents submit false predictions:
-
-```python
-# Inject Byzantine agents with corrupted predictions
-python demo/byzantine_scenarios.py --byzantine-ratio 0.3 --attack-type random
-# Measure consensus effectiveness at rejecting false state updates
-```
-
-Expected research questions:
-- How many Byzantine validators can PBFT tolerate before state corruption?
-- Can ML ensemble methods (stacking, voting) improve Byzantine resilience?
-- What are detection latencies for subtle adversarial perturbations?
-
-### Real-Time Digital Twin Synchronization
-
-Measure real-time performance under high-frequency updates:
-
-```bash
-# Simulate 1000 concurrent state updates/second
-node benchmarks/stress_test.js --rate 1000 --duration 60
-```
-
-Expected research questions:
-- Can permissioned blockchains achieve sub-second finality for physical state updates?
-- How do network partitions affect eventual consistency guarantees?
-- What is the minimum viable blockchain architecture for real-time digital twins?
+**Expected outputs**: `demo/results_kpi.csv` (3000 rows), `demo/summary_results.csv` (aggregated metrics), publication-ready plots showing latency distributions and throughput comparisons.
 
 ## Testing and Quality Assurance
 
