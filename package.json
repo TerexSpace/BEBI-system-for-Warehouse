@@ -1,7 +1,7 @@
 {
-  "name": "blockchain-erp-prototype",
+  "name": "blockchaindt",
   "version": "1.0.0",
-  "description": "Blockchain-based ERP Warehouse Management System",
+  "description": "Research framework for distributed consensus in physical-digital state synchronization",
   "main": "erp-prototype/backend/app.js",
   "scripts": {
     "start": "cd erp-prototype/backend && node app.js",
@@ -24,11 +24,24 @@
   },
   "keywords": [
     "blockchain",
-    "erp",
-    "warehouse",
-    "hyperledger",
-    "fabric"
+    "distributed-systems",
+    "digital-twin",
+    "consensus-protocols",
+    "byzantine-fault-tolerance",
+    "machine-learning",
+    "research-software",
+    "hyperledger-fabric",
+    "state-synchronization",
+    "reproducible-research"
   ],
-  "author": "Blockchain-ERP Team",
-  "license": "MIT"
+  "author": "Almas Ospanov <ospanov@astanait.edu.kz>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TerexSpace/BEBI-system-for-Warehouse.git"
+  },
+  "bugs": {
+    "url": "https://github.com/TerexSpace/BEBI-system-for-Warehouse/issues"
+  },
+  "homepage": "https://github.com/TerexSpace/BEBI-system-for-Warehouse#readme"
 }
