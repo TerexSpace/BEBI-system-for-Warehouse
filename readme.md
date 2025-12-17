@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/TerexSpace/BEBI-system-for-Warehouse/workflows/CI/badge.svg)](https://github.com/TerexSpace/BEBI-system-for-Warehouse/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17738530.svg)](https://doi.org/10.5281/zenodo.17738530)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17964026.svg)](https://doi.org/10.5281/zenodo.17964026)
 [![JOSS](https://joss.theoj.org/papers/10.21105/joss.XXXXX/status.svg)](https://joss.theoj.org/papers/10.21105/joss.XXXXX)
 
 **BlockchainDT** is an open-source research framework for investigating distributed consensus mechanisms in physical-digital state synchronization systems. The framework enables researchers to study how blockchain consensus protocols perform when multiple autonomous agents must agree on the state of physical objects based on sensor measurements, ML predictions, and policy enforcement—all without centralized coordination.

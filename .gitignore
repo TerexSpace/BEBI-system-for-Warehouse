@@ -83,15 +83,23 @@ $RECYCLE.BIN/
 .claude/
 .claude.json
 
+# --- GitHub Actions (not needed for JOSS submission) ---
+.github/
+
 # --- Development Helper Documents (Review & Submission) ---
 # These are internal documents for JOSS submission and code review
 # They should not be committed to GitHub
-JOSS_SUBMISSION_CHECKLIST.md
-JOSS_SUBMISSION_INSTRUCTIONS.md
-JOSS_REVIEW_SUMMARY.md
-JOSS_FINAL_SUBMISSION_GUIDE.md
-COMPREHENSIVE_REVIEW_REPORT.md
-SUBMISSION_STATUS.md
+JOSS_*.md
+DELIVERABLES_INDEX.md
+FILES_TO_COMMIT.md
+GIT_COMMIT_GUIDE.md
+FINAL_SUMMARY.md
+P0_P1_FIXES_COMPLETE.md
+NEXT_STEPS.md
+SUBMISSION_READINESS_REPORT.md
+JOSS_Reformation_Toolkit.md
+JOSS_Rejection_Analysis_and_Strategy.md
+JOSS_Transformation_Examples.md
 joss_paper_preparation.md
 README_JOSS.md
 

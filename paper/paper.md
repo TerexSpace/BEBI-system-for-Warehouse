@@ -19,7 +19,7 @@ affiliations:
 date: 2025-12-14
 bibliography: paper.bib
 repository: https://github.com/TerexSpace/BEBI-system-for-Warehouse.git
-archive_doi: 10.5281/zenodo.17738530
+archive_doi: 10.5281/zenodo.17964026
 ---
 
 ## Summary
